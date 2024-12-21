@@ -16,6 +16,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { createAccount } from "@/lib/actions/user.actions";
+import OTPModal from "./OTPModal";
 
 type FormType = "sign-in" | "sign-up";
 
@@ -45,7 +46,7 @@ export default function AuthForm({ type }: { type: FormType }) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setErrorMessage("w");
+    setErrorMessage("");
 
     try {
       const user = await createAccount({
@@ -147,6 +148,9 @@ export default function AuthForm({ type }: { type: FormType }) {
           </div>
         </form>
       </Form>
+      {true && (
+        <OTPModal email={form.getValues("email")} accoundId={accountId} />
+      )}
     </>
   );
 }
