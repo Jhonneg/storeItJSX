@@ -1,9 +1,10 @@
 "use server";
 import { Query, ID } from "node-appwrite";
-import { createAdminClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 import { appWriteConfig } from "../appwrite/config";
 import { parseStringify } from "../utils";
 import { cookies } from "next/headers";
+import { avatarPlacehoderURL } from "@/constants";
 
 export async function getUserByEmail(email: string) {
   const { databases } = await createAdminClient();
@@ -55,8 +56,7 @@ export async function createAccount({
       {
         fullName,
         email,
-        avatar:
-          "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png",
+        avatar: avatarPlacehoderURL,
         accountId,
       }
     );
@@ -86,4 +86,20 @@ export async function verifySecret({
   } catch (error) {
     handleError(error, "Failed to verify OTP");
   }
+}
+
+export async function getCurrentUser() {
+  const { databases, account } = await createSessionClient();
+
+  const result = await account.get();
+
+  const user = await databases.listDocuments(
+    appWriteConfig.databaseId,
+    appWriteConfig.usersCollectionId,
+    [Query.equal("accountId", result.$id)]
+  );
+
+  if (user.total <= 0) return null;
+
+  return parseStringify(user.documents[0]);
 }
