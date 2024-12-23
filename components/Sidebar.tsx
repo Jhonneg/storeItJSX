@@ -1,5 +1,5 @@
 "use client";
-import { avatarPlacehoderURL, navItems } from "@/constants";
+import { navItems } from "@/constants";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -68,13 +68,13 @@ export default function Sidebar({ fullName, avatar, email }: Props) {
       <div className="sidebar-user-info">
         <Image
           className="sidebar-user-avatar"
-          src={avatarPlacehoderURL}
+          src={avatar}
           alt="Avatar"
           width={44}
           height={44}
         />
         <div className="hidden lg:block">
-          <p className="sub-title-2 capitalize">{fullName}</p>
+          <p className="subtitle-2 capitalize">{fullName}</p>
           <p className="caption">{email}</p>
         </div>
       </div>
