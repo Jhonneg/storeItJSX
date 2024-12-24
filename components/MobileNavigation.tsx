@@ -3,7 +3,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
@@ -16,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import FileUploader from "./FileUploader";
+import { singOutUser } from "@/lib/actions/user.actions";
 
 type Props = {
   ownerId: string;
@@ -102,8 +102,8 @@ export default function MobileNavigation({
             <FileUploader />
             <Button
               type="submit"
-              className="sign-out-button"
-              onClick={() => {}}
+              className="mobile-sign-out-button"
+              onClick={async () => await singOutUser()}
             >
               <Image
                 src="/assets/icons/logout.svg"

@@ -5,6 +5,7 @@ import { appWriteConfig } from "../appwrite/config";
 import { parseStringify } from "../utils";
 import { cookies } from "next/headers";
 import { avatarPlacehoderURL } from "@/constants";
+import { redirect } from "next/navigation";
 
 export async function getUserByEmail(email: string) {
   const { databases } = await createAdminClient();
@@ -102,4 +103,32 @@ export async function getCurrentUser() {
   if (user.total <= 0) return null;
 
   return parseStringify(user.documents[0]);
+}
+
+export async function singOutUser() {
+  const { account } = await createSessionClient();
+
+  try {
+    await account.deleteSession("current");
+    (await cookies()).delete("appwrite-session");
+  } catch (error) {
+    handleError(error, "Failed to sign out user");
+  } finally {
+    redirect("/sign-in");
+  }
+}
+
+export async function signInUser({ email }: { email: string }) {
+  try {
+    const existingUser = await getUserByEmail(email);
+
+    if (existingUser) {
+      await sendEmailOTP({ email });
+      return parseStringify({ accountId: existingUser.accountId });
+    }
+
+    return parseStringify({ accountId: null, error: "User bot found" });
+  } catch (error) {
+    handleError(error, "Failed to sign in user");
+  }
 }
