@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { cn, convertFileToUrl, getFileType } from "@/lib/utils";
 import Image from "next/image";
 import Thumbnail from "./Thumbnail";
+import { MAX_FILE_SIZE } from "@/constants";
 
 type Props = {
   ownerId: string;
@@ -17,6 +18,12 @@ export default function FileUploader({ ownerId, accountId, className }: Props) {
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
+
+    const uploadPromise = acceptedFiles.map(async (file) => {
+      if (file.size > MAX_FILE_SIZE) {
+        setFiles((prevFiles) => prevFiles.filter((f) => f.name !== file.name));
+      }
+    });
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
@@ -83,7 +90,7 @@ export default function FileUploader({ ownerId, accountId, className }: Props) {
       {isDragActive ? (
         <p>Drop the files here ...</p>
       ) : (
-        <p>Drag 'n' drop some files here, or click to select files</p>
+        <p>Drag &apos;n&apos; drop some files here, or click to select files</p>
       )}
     </div>
   );
