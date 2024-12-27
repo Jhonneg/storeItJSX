@@ -36,7 +36,7 @@ export async function uploadFile({
       url: constructFileUrl(bucketFile.$id),
       extension: getFileType(bucketFile.name).extension,
       size: bucketFile.sizeOriginal,
-      owned: ownerId,
+      owner: ownerId,
       accountId,
       users: [],
       bucketFileId: bucketFile.$id,
