@@ -10,7 +10,11 @@ export default function Header() {
     <header className="header">
       <Search />
       <div className="header-wrapper">
-        <FileUploader />
+        <FileUploader
+          ownerId={ownerId}
+          accountId={accountId}
+          className={className}
+        />
         <form
           action={async () => {
             "use server";
