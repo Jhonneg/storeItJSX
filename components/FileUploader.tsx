@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "./ui/button";
 import { cn, convertFileToUrl, getFileType } from "@/lib/utils";
@@ -20,6 +20,14 @@ export default function FileUploader({ ownerId, accountId, className }: Props) {
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+  function handleRemoveFile(
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
+    fileName: string
+  ) {
+    e.stopPropagation();
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+  }
 
   return (
     <div {...getRootProps()} className="cursor-pointer">
@@ -60,6 +68,13 @@ export default function FileUploader({ ownerId, accountId, className }: Props) {
                     />
                   </div>
                 </div>
+                <Image
+                  src="/assets/icons/remove.svg"
+                  width={24}
+                  height={24}
+                  alt="Remove"
+                  onClick={(e) => handleRemoveFile(e, file.name)}
+                />
               </li>
             );
           })}
