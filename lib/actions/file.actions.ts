@@ -65,7 +65,7 @@ function createQueries(currentUser: Models.Document) {
   const queries = [
     Query.or([
       Query.equal("owner", [currentUser.$id]),
-      Query.equal("users", [currentUser.email]),
+      Query.contains("users", [currentUser.email]),
     ]),
   ];
   return queries;
@@ -87,6 +87,6 @@ export async function getFiles() {
 
     return parseStringify(files);
   } catch (error) {
-    handleError(error, "Fauled to get files");
+    handleError(error, "Failed to get files");
   }
 }
