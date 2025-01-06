@@ -1,5 +1,10 @@
 "use client";
-import { Dialog } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,18 +13,66 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { actionsDropdownItems } from "@/constants";
 import { constructDownloadUrl } from "@/lib/utils";
 import { ActionType } from "@/types";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
 import { Models } from "node-appwrite";
 import { useState } from "react";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 export default function ActionDropdown({ file }: { file: Models.Document }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [action, setAction] = useState<ActionType | null>(null);
+  const [name, setName] = useState(file.name);
+  const [isLoading, setIsLoading] = useState(false);
+
+  function renderDialogContent() {
+    if (!action) return null;
+
+    const { value, label } = action;
+
+    return (
+      <DialogContent className="shad-dialog button">
+        <DialogHeader className="flex flex-col gap-3">
+          <DialogTitle className="text-center text-light-100">
+            {label}
+          </DialogTitle>
+          <DialogDescription>
+            {value === "rename" && (
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        {["rename", "delete", "share"].includes(value) && (
+          <DialogFooter className="flex flex-col gap-3 md:flex-row">
+            <Button>Cancel</Button>
+            <Button>
+              <p className="capitalize">Submit</p>
+              {isLoading && (
+                <Image
+                  src="/assets/icons/loader.svg"
+                  alt="loader"
+                  width={24}
+                  height={24}
+                  className="animate-spin"
+                />
+              )}
+            </Button>
+          </DialogFooter>
+        )}
+      </DialogContent>
+    );
+  }
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -81,6 +134,7 @@ export default function ActionDropdown({ file }: { file: Models.Document }) {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+      {renderDialogContent()}
     </Dialog>
   );
 }
