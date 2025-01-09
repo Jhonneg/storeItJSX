@@ -24,6 +24,9 @@ import { Models } from "node-appwrite";
 import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { renameFile } from "@/lib/actions/file.actions";
+import path from "path";
+import { usePathname } from "next/navigation";
 
 export default function ActionDropdown({ file }: { file: Models.Document }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,12 +34,29 @@ export default function ActionDropdown({ file }: { file: Models.Document }) {
   const [action, setAction] = useState<ActionType | null>(null);
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
+  const path = usePathname();
 
   function closeAllModals() {
-    setIsModalOpen(false)
-    setIsDropdownOpen(false)
-    setAction(null)
-    setName(file.name)
+    setIsModalOpen(false);
+    setIsDropdownOpen(false);
+    setAction(null);
+    setName(file.name);
+  }
+
+  async function handleAction() {
+    if (!action) return;
+    setIsLoading(true);
+    let success = false;
+
+    const actions = {
+      rename: () =>
+        renameFile({ fileId: file.$id, name, extention: file.extension, path }),
+      share: () => console.log("share"),
+      delete: () => console.log("delete"),
+    };
+    success = await actions[action.value as keyof typeof actions]();
+    if (success) closeAllModals();
+    setIsLoading(false);
   }
 
   function renderDialogContent() {
@@ -62,8 +82,10 @@ export default function ActionDropdown({ file }: { file: Models.Document }) {
         </DialogHeader>
         {["rename", "delete", "share"].includes(value) && (
           <DialogFooter className="flex flex-col gap-3 md:flex-row">
-            <Button>Cancel</Button>
-            <Button>
+            <Button onClick={closeAllModals} className="modal-cancel-button">
+              Cancel
+            </Button>
+            <Button onClick={handleAction} className="modal-submit-button">
               <p className="capitalize">Submit</p>
               {isLoading && (
                 <Image
